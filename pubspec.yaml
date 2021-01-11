@@ -12,11 +12,12 @@ dependencies:
   flutter:
     sdk: flutter
 
-  get: 3.22.2
+  get: ^3.24.0
 #  scoped_model: 1.1.0
   system_shortcuts: 1.0.0
+  android_alarm_manager: 0.4.5+20
 
-  cupertino_icons: ^1.0.1+1
+  cupertino_icons: ^1.0.2
 
 dev_dependencies:
   flutter_test:

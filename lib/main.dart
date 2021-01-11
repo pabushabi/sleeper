@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
 import 'TimerWidget.dart';
-// import 'package:scoped_model/scoped_model.dart';
+import 'package:android_alarm_manager/android_alarm_manager.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,18 +16,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         accentColor: Color.fromARGB(255, 139, 117, 205),
-        primaryColor: Color.fromARGB(255, 139, 117, 205),
-        // primarySwatch: Colors.deepPurple,
-        iconTheme: IconThemeData(color: Colors.black54),
       ),
       darkTheme: ThemeData(
-          brightness: Brightness.dark,
-          // accentColor: Colors.deepPurple.shade300,
-          accentColor: Color.fromARGB(255, 139, 117, 205),
-          primaryColor: Color.fromARGB(255, 139, 117, 205),
-          primaryColorDark: Color.fromARGB(255, 139, 117, 205),
-          // primarySwatch: Colors.deepPurple,
-          iconTheme: IconThemeData(color: Colors.white60)),
+        brightness: Brightness.dark,
+        accentColor: Color.fromARGB(255, 139, 117, 205),
+      ),
       themeMode: ThemeMode.system,
       home: MyHomePage(),
     );
@@ -36,8 +29,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
-
-  var firstSwitch = true;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -49,7 +40,6 @@ class _MyHomePageState extends State<MyHomePage> {
   var isSelected;
   var theme = 0;
 
-  // var cardColor = Colors.deepPurple.shade300;
   var cards = [
     ["10:20", true, false, true],
     ["00:00", true, true, true],
@@ -61,6 +51,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     isSelected = [true, false];
     super.initState();
+  }
+
+  showSnack(text) {
+    return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('$text'),
+    ));
   }
 
   @override
@@ -126,139 +122,30 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {
-          showModalBottomSheet(
-              context: context,
-              builder: (BuildContext ctx) {
-                return StatefulBuilder(
-                    builder: (BuildContext context, StateSetter setModalState) {
-                  return Padding(
-                      padding: EdgeInsets.only(left: 40, right: 40, top: 40),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.all(6),
-                                child: ToggleButtons(
-                                  children: [
-                                    Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Text("Таймер")),
-                                    Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Text("Время")),
-                                  ],
-                                  onPressed: (int index) {
-                                    setModalState(() {
-                                      for (int i = 0;
-                                          i < isSelected.length;
-                                          i++) {
-                                        isSelected[i] = i == index;
-                                      }
-                                    });
-                                  },
-                                  isSelected: isSelected,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              Spacer(),
-                              Padding(
-                                  padding: EdgeInsets.all(6),
-                                  child: SizedBox(
-                                      height: 40,
-                                      width: 80,
-                                      child: TextFormField(
-                                          controller: _controller,
-                                          readOnly: true,
-                                          style: TextStyle(
-                                              fontSize: 30,
-                                              fontWeight: FontWeight.w500),
-                                          onTap: () {
-                                            showTimePicker(
-                                              context: context,
-                                              initialTime: TimeOfDay.now(),
-                                            ).then((value) => {
-                                                  _controller.text = value
-                                                      ?.toString()
-                                                      ?.substring(10, 15)
-                                                });
-                                          }))),
-                            ],
-                          ),
-                          Row(children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  // color: cardColor,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      spreadRadius: 4,
-                                      blurRadius: 7,
-                                      offset: Offset(3, 3),
-                                    )
-                                  ]),
-                              child: Padding(
-                                padding: EdgeInsets.all(14.0),
-                                child: Text("Wi-Fi"),
-                              ),
-                              margin: EdgeInsets.symmetric(horizontal: 8.0),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  // color: cardColor,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      spreadRadius: 4,
-                                      blurRadius: 7,
-                                      offset: Offset(3, 3),
-                                    )
-                                  ]),
-                              child: Padding(
-                                padding: EdgeInsets.all(14.0),
-                                child: Text("Cell"),
-                              ),
-                              margin: EdgeInsets.symmetric(horizontal: 8.0),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  // color: cardColor,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      spreadRadius: 4,
-                                      blurRadius: 7,
-                                      offset: Offset(3, 3),
-                                    )
-                                  ]),
-                              child: Padding(
-                                padding: EdgeInsets.all(14.0),
-                                child: Text("App"),
-                              ),
-                              margin: EdgeInsets.symmetric(horizontal: 8.0),
-                            ),
-                          ]),
-                          IconButton(
-                            icon: Icon(Icons.done),
-                            tooltip: "Готово",
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          )
-                        ],
-                      ));
-                });
-              })
+        onPressed: () async => {
+          // showSnack(),
+          showTimePicker(
+            context: context,
+            initialTime: TimeOfDay.now(),
+            helpText: "ВЫБЕРИТЕ ВРЕМЯ",
+            cancelText: "ОТМЕНА",
+          ).then((value) => {
+                showSnack(value?.toString()?.substring(10, 15))
+                // var val = value.
+              }),
+          // await AndroidAlarmManager.initialize(),
+          // await AndroidAlarmManager.periodic(Duration(seconds: 15), 10, sayHello),
+          print("hellova!"),
+          // await AndroidAlarmManager.oneShotAt(DateTime.fromMillisecondsSinceEpoch(1610250300000), 0, showSnack());
         },
         tooltip: 'Add new timer',
         child: Icon(Icons.add),
+        backgroundColor: Colors.deepPurple.shade300,
       ),
     );
+  }
+
+  void sayHello() {
+    print("[${DateTime.now()}] hello!");
   }
 }
